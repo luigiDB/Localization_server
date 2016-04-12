@@ -174,4 +174,7 @@ public class DatabaseHelper {
 
         return res;
     }
+
+    //TODO: query to extract list of experiment
+    //TODO: query to extract list of measurment of experiment
 }
