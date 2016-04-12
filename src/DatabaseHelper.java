@@ -151,5 +151,27 @@ public class DatabaseHelper {
         return res;
     }
 
+    public ArrayList<String> getRoomList(String building) {
+        System.out.println("getRoomList");
+        File fileDb = getDbList()[0];
+        ArrayList<String> res = new ArrayList<>();
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + fileDb);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT distinct(" + KEY_EDIFICIO + ") as building, " + KEY_PIANO + ", " + KEY_AULA + "\n" +
+                    "FROM " + TABLE_MEASURES + "\n" +
+                    "WHERE " + KEY_EDIFICIO + " = '" + building + "'");
+            while(resultSet.next()) {
+                res.add(resultSet.getString("building") + "_" + resultSet.getString(KEY_PIANO) + "_" + resultSet.getString(KEY_AULA));
+            }
 
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+        }
+
+        return res;
+    }
 }
