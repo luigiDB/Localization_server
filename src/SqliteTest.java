@@ -11,16 +11,15 @@ import java.util.Arrays;
 public class SqliteTest {
     public static void main( String args[] )
     {
-        Connection secondaryDb;
-        Statement statement;
-        ResultSet resultSet;
+        //Connection secondaryDb;
+        //Statement statement;
+        //ResultSet resultSet;
 
-        String basePath = "C:\\Users\\luigi\\Desktop\\db test\\src\\";
-        String basePathExtension = "resources\\";
+        String basePath = "C:\\resources\\";
 
         //file list
         System.out.println("db list");
-        File dir = new File(basePath + basePathExtension);
+        File dir = new File(basePath);
         File[] files = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".db");
@@ -42,6 +41,7 @@ public class SqliteTest {
                 mainDb.prepareStatement("INSERT INTO test(Field2, Field3)" +
                         "SELECT Field2, Field3 FROM fromDB.test").execute();
 
+                mainDb.prepareStatement("DETACH DATABASE fromDB").execute();
                 /* print the content of a DB
                 statement = secondaryDb.createStatement();
                 resultSet = statement.executeQuery("SELECT * FROM test");
