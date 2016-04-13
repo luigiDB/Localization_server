@@ -75,7 +75,6 @@ public class DatabaseHelper {
     }
 
     public File[] getDbList() {
-        System.out.println("getDbList");
         File dir = new File(basePath);
         File[] files = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
