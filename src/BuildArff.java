@@ -40,15 +40,61 @@ public class BuildArff {
         ArrayList<String> bssidList =  databaseHelper.getBssid(building);
         ArrayList<String> roomList = databaseHelper.getRoomList(building);
 
-        ARFFParser parser;
-        if(destinationPath == null) {
-            parser = new ARFFParser(fileName);
-        } else {
-            parser = new ARFFParser(fileName, destinationPath);
+        if(databaseHelper.mergeDb() != 1) {
+            return false;
         }
 
-        //////////////////////////////////////
-        //compute attributes in a LinkedHashMap
+        ARFFParser parser;
+        if(destinationPath == null) {
+            parser = new ARFFParser(fileName + "_" + building + ".arff");
+        } else {
+            parser = new ARFFParser(fileName + "_" + building + ".arff", destinationPath);
+        }
+
+
+        computeAttributes(parser, bssidList, roomList);
+
+
+        //String[MAC1_SSID, MAC2_SSID, MAC3_SSID, ..., class] for each experiment
+        String[] train =  new String[bssidList.size() + 1];
+        LinkedHashMap<String, String> measures = null;
+
+        //Access room [Building]
+        for(String room: roomList) {
+            String[] roomPosition = room.split("_");
+            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0], roomPosition[1], roomPosition[2]);
+
+            //Access sample (collection of measurements) [Building [Room]]
+            for(String experimentId: experimentsId) {
+                Arrays.fill(train, "0");
+                train[train.length - 1] = room;
+
+                measures = databaseHelper.getMeasurments(experimentId);
+
+                //Access measurement [Building [Room [Ssmple]]]
+                for(String bssid: measures.keySet()){
+                    String rssi = measures.get(bssid);
+
+                    //insert measure in the array
+                    int index = getIndex(bssidList, bssid);
+                    if(index < 0) {
+                        return false;
+                    }
+                    if(!rssi.equals("")) {  //maintain zero in the array in case of null value in the array
+                        train[index] = rssi;
+                    }
+                }
+                //parse the array in the arff file
+                parser.writeDataRow(train);
+            }
+        }
+
+
+        parser.closeFile();
+        return true;
+    }
+
+    private void computeAttributes(ARFFParser parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
         LinkedHashMap<String, String> attributeList = new LinkedHashMap<>();
         for(String bssid: bssidList) {
             attributeList.put(bssid, "string");
@@ -57,39 +103,18 @@ public class BuildArff {
 
         //send to parser
         parser.setAttributes(attributeList);
-        /////////////////////////////////////
-
-        //String[MAC1_SSID, MAC2_SSID, MAC3_SSID, ..., class] for each experiment
-        String[] train =  new String[roomList.size() + 1];
-        LinkedHashMap<String, String> measures = null;
-
-        ArrayList<String> experimentsId = databaseHelper.getExperiments(building);
-        for(String experimentId: experimentsId) {
-            Arrays.fill(train, "0");
-
-            measures = databaseHelper.getMeasurments(experimentId);
-            for(String bssid: measures.keySet()){
-                String ssid = measures.get(bssid);
-
-                int index = getIndex(bssidList, bssid);
-                train[index] = ssid;
-            }
-            parser.writeDataRow(train);
-        }
-
-        parser.closeFile();
-        return true;
     }
 
     private String computeClassValues(ArrayList<String> roomList) {
         String nominalValue = "{";
         for(int i = 0 ; i < roomList.size() ; i++) {
-            nominalValue.concat(roomList.get(i).toString());
+            nominalValue += roomList.get(i);
             if(i != (roomList.size()-1)) {
-                nominalValue.concat(",");
+                nominalValue += ",";
             }
         }
-        nominalValue.concat("}");
+        nominalValue += "}";
+        System.out.println("\n\nNOMINAL VALUE: " + nominalValue);
         return nominalValue;
     }
 
@@ -97,8 +122,8 @@ public class BuildArff {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).equalsIgnoreCase(elem)) {
                 return i;
-                break;
             }
         }
+        return -1;
     }
 }
