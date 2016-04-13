@@ -213,6 +213,7 @@ public class DatabaseHelper {
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:" + fileDb);
             Statement statement = connection.createStatement();
+            //TODO: deve ritornare anche l'aula
             ResultSet resultSet = statement.executeQuery("SELECT " + KEY_BSSID + ", " + KEY_SSID + "\n" +
                     "FROM " + TABLE_MEASURES + "\n" +
                     "WHERE " + KEY_ID_MEASURE + " = \"" + experiment + "\"");
