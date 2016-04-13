@@ -179,17 +179,21 @@ public class DatabaseHelper {
         return res;
     }
 
-    //TODO: [TO BE TESTED]query to extract list of experiment
-    public ArrayList<String> getExperiments(String building) {
+
+    public ArrayList<String> getExperiments(String building, String floor, String room) {
         System.out.println("getExperiments()");
         File fileDb = getDbList()[0];
         ArrayList<String> res = new ArrayList<>();
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:" + fileDb);
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT distinct(" + KEY_ID_MEASURE +") as ret\n" +
+            String query = "SELECT distinct(" + KEY_ID_MEASURE +") as ret\n" +
                     "FROM " + TABLE_MEASURES + "\n" +
-                    "WHERE " + KEY_EDIFICIO + " = \"" + building + "\"");
+                    "WHERE " + KEY_EDIFICIO + " = \"" + building + "\" " +
+                    "AND " + KEY_PIANO + " = \"" + floor + "\" " +
+                    "AND " + KEY_AULA + " = \"" + room + "\"";
+            System.out.println("QUERY: " + query);
+            ResultSet resultSet = statement.executeQuery(query);
             while(resultSet.next()) {
                 res.add(resultSet.getString("ret"));
             }
@@ -205,7 +209,6 @@ public class DatabaseHelper {
     }
 
 
-    //TODO: [TO BE TESTED]query to extract list of measurment of experiment
     public LinkedHashMap<String, String> getMeasurments(String experiment) {
         System.out.println("getMeasurments");
         File fileDb = getDbList()[0];
@@ -213,13 +216,12 @@ public class DatabaseHelper {
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:" + fileDb);
             Statement statement = connection.createStatement();
-            //TODO: deve ritornare anche l'aula
-            ResultSet resultSet = statement.executeQuery("SELECT " + KEY_BSSID + ", " + KEY_SSID + "\n" +
+            ResultSet resultSet = statement.executeQuery("SELECT " + KEY_BSSID + ", " + KEY_RSSI + "\n" +
                     "FROM " + TABLE_MEASURES + "\n" +
                     "WHERE " + KEY_ID_MEASURE + " = \"" + experiment + "\"");
             while(resultSet.next()) {
                 //res.add(resultSet.getString("ret"));
-                res.put(resultSet.getString(KEY_BSSID), resultSet.getString(KEY_SSID));
+                res.put(resultSet.getString(KEY_BSSID), resultSet.getString(KEY_RSSI));
             }
 
             resultSet.close();
