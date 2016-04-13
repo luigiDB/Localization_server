@@ -7,10 +7,14 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * Created by Luigi on 12/04/2016.
  */
+
+//TODO: dato che tutte le funzioni chimano la getDbList()[0] potrei anche fare in modo che avvenga in automatico la merge nel caso in cui getDbList().length>1
+//TODO: fare in modo che se si passa un oggetto Statement alla funzione non lo rialloca ogni volta
 public class DatabaseHelper {
 
     private String basePath;
@@ -175,6 +179,55 @@ public class DatabaseHelper {
         return res;
     }
 
-    //TODO: query to extract list of experiment
-    //TODO: query to extract list of measurment of experiment
+    //TODO: [TO BE TESTED]query to extract list of experiment
+    public ArrayList<String> getExperiments(String building) {
+        System.out.println("getExperiments()");
+        File fileDb = getDbList()[0];
+        ArrayList<String> res = new ArrayList<>();
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + fileDb);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT distinct(" + KEY_ID_MEASURE +") as ret\n" +
+                    "FROM " + TABLE_MEASURES + "\n" +
+                    "WHERE " + KEY_EDIFICIO + " = \"" + building + "\"");
+            while(resultSet.next()) {
+                res.add(resultSet.getString("ret"));
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+        }
+
+        return res;
+    }
+
+
+    //TODO: [TO BE TESTED]query to extract list of measurment of experiment
+    public LinkedHashMap<String, String> getMeasurments(String experiment) {
+        System.out.println("getMeasurments");
+        File fileDb = getDbList()[0];
+        LinkedHashMap<String, String> res = new LinkedHashMap<>();
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + fileDb);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT " + KEY_BSSID + ", " + KEY_SSID + "\n" +
+                    "FROM " + TABLE_MEASURES + "\n" +
+                    "WHERE " + KEY_ID_MEASURE + " = \"" + experiment + "\"");
+            while(resultSet.next()) {
+                //res.add(resultSet.getString("ret"));
+                res.put(resultSet.getString(KEY_BSSID), resultSet.getString(KEY_SSID));
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+        }
+
+        return res;
+    }
 }
