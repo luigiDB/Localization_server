@@ -1,4 +1,7 @@
-
+import weka.classifiers.Classifier;
+import weka.classifiers.lazy.IBk;
+import weka.core.Instance;
+import weka.core.Instances;
 
 /**
  * Created by luigi on 12/04/2016.
@@ -12,5 +15,6 @@ public class SqliteTest {
 
         BuildArff ba = new BuildArff(dh, "baruffa", basePath);
         ba.exportArffFiles();
+
     }
 }
