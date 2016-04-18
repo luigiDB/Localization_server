@@ -100,12 +100,12 @@ public class ARFFParser {
         if(attrValues == null)
                 return false;
         try {
+            fb.write("\n");
             for(int i = 0; i < attrValues.length; i++){   
                 fb.write(attrValues[i]);
                 if(i < attrValues.length - 1)
                     fb.write(",");
             }
-            fb.write("\n");
         } catch (IOException ex) {
             Logger.getLogger(ARFFParser.class.getName()).log(Level.SEVERE, null, ex);
         }

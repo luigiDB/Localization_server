@@ -13,9 +13,11 @@ import java.util.Random;
 public class ClassifierService {
     Classifier cls;
     String[] classes;
+    Instances data;
     public ClassifierService() {
         cls = null;
         classes = null;
+        data = null;
     }
 
     public boolean buildClassifier(String filePath){
@@ -24,7 +26,7 @@ public class ClassifierService {
         try {
             //Read the arff file
             DataSource source = new DataSource(filePath);
-            Instances data = source.getDataSet();
+            data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
             //Build the classifier
             cls = new IBk();
@@ -43,8 +45,21 @@ public class ClassifierService {
         return true;
     }
 
-    public String classify(){
-        
-        return null;
+    public String classify(String[] sample){
+        if(sample == null || sample.length != data.numAttributes())
+            return null;
+        try {
+            double[] parsedSample = new double[sample.length];
+            for(int i = 0; i < sample.length; i++)
+                parsedSample[i] = Double.parseDouble(sample[i]);
+            Instance toClassify =  data.firstInstance().copy(parsedSample);
+
+            int classIndex = (int)cls.classifyInstance(toClassify);
+            return classes[classIndex];
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
 }
