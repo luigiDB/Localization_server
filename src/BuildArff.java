@@ -97,7 +97,7 @@ public class BuildArff {
     private void computeAttributes(ARFFParser parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
         LinkedHashMap<String, String> attributeList = new LinkedHashMap<>();
         for(String bssid: bssidList) {
-            attributeList.put(bssid, "string");
+            attributeList.put(bssid, "real");
         }
         attributeList.put("class", computeClassValues(roomList));
 
