@@ -43,7 +43,6 @@ public class BuildArff {
     private boolean exportArffFile(String building) {
         //get bssid list for building
         ArrayList<String> bssidList =  databaseHelper.getBssid(building);
-
         //load in the buildingInformations
         if(!buildingsInformations.addBuildingWithInfo(building, bssidList)) {
             return false;
@@ -51,6 +50,8 @@ public class BuildArff {
 
         //get room list for building
         ArrayList<String> roomList = databaseHelper.getRoomList(building);
+        //roomList may contains spaces that need to filled with -
+        replaceString(roomList, " ", "-");
 
         if(databaseHelper.mergeDb() != 1) {
             return false;
@@ -146,5 +147,11 @@ public class BuildArff {
             }
         }
         return -1;
+    }
+
+    private void replaceString(ArrayList<String> list, String originChar, String newChar) {
+        for(String elem: list) {
+            elem.replaceAll(originChar, newChar);
+        }
     }
 }
