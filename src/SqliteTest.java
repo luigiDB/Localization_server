@@ -3,6 +3,8 @@ import weka.classifiers.lazy.IBk;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 /**
  * Created by luigi on 12/04/2016.
  */
@@ -10,13 +12,26 @@ public class SqliteTest {
     public static void main( String args[] )
     {
 
+        //merge and generate arff files
         String basePath = "C:\\resources\\";
-        /*
+
         DatabaseHelper dh = new DatabaseHelper(basePath);
 
-        BuildArff ba = new BuildArff(dh, "baruffa", basePath);
+        //export arff files
+        BuildingsInformations bi = new BuildingsInformations();
+        BuildArff ba = new BuildArff(dh, "baruffa", bi, basePath);
         ba.exportArffFiles();
-        */
+
+        //testing the classifier
+        LinkedHashMap<String, String> sample;       //need to initialized
+        //find the building by searching for the first bssid in sample
+        String building = bi.getBuilding(sample.entrySet().iterator().next());
+        ArrayList<String> bssid = bi.getBssidList(building);
+        String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
+
+        System.out.println("VIsual check of created sample: \n" + trainArray.toString());
+
+
         //TEST CLASSE ClassifierService
         ClassifierService cls = new ClassifierService();
         cls.buildClassifier(basePath + "baruffa_polo_c.arff");
