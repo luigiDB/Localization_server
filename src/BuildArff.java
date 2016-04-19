@@ -93,7 +93,7 @@ public class BuildArff {
         return true;
     }
 
-    public String[] computeMeasurementArray(LinkedHashMap<String, String> measures, ArrayList<String> bssidList, String room) {
+    public static String[] computeMeasurementArray(LinkedHashMap<String, String> measures, ArrayList<String> bssidList, String room) {
         String[] train =  new String[bssidList.size() + 1];
         Arrays.fill(train, "0");
         for(String bssid: measures.keySet()){
@@ -140,7 +140,7 @@ public class BuildArff {
         return nominalValue;
     }
 
-    private int getIndex(ArrayList<String> list, String elem) {
+    private static int getIndex(ArrayList<String> list, String elem) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).equalsIgnoreCase(elem)) {
                 return i;
