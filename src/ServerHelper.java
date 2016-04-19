@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedHashMap;
 
 /**
  * Created by Giulio on 17/04/2016.
@@ -59,5 +60,24 @@ public class ServerHelper {
             return false;
         }
         return true;
+    }
+
+    //Assuming that the data format sent by the android application is like "Mac1=pow1,Mac2=pow2,Mac3=pow3"
+    public LinkedHashMap<String,String> readClientRecord(){
+        LinkedHashMap<String,String> ret;
+        String record;
+        String[] firstStage;
+        String[] secondStage;
+
+        record =  readSingleLine();
+        if(record == null || record.isEmpty())
+            return null;
+        firstStage = record.split(",");
+        ret = new LinkedHashMap<>();
+        for(String str : firstStage){
+            secondStage = str.split("=");
+            ret.put(secondStage[0],secondStage[1]);
+        }
+        return ret;
     }
 }
