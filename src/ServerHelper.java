@@ -22,6 +22,7 @@ public class ServerHelper {
         client = null;
         try {
             server = new ServerSocket(portNumber);
+            server.setReuseAddress(true);
 
         } catch (IOException e) {
             e.printStackTrace();
