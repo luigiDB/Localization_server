@@ -12,16 +12,19 @@ public class BuildArff {
     private DatabaseHelper databaseHelper = null;
     private String destinationPath = null;
     private String fileName = null;
+    private BuildingsInformations buildingsInformations;
 
-    public BuildArff(DatabaseHelper dh, String name, String dest) {
+    public BuildArff(DatabaseHelper dh, String name, BuildingsInformations bi, String dest) {
         databaseHelper = dh;
         fileName = name;
         destinationPath = dest;
+        buildingsInformations = bi;
     }
 
-    public BuildArff(DatabaseHelper dh, String name) {
+    public BuildArff(DatabaseHelper dh, String name, BuildingsInformations bi) {
         databaseHelper = dh;
         fileName = name;
+        buildingsInformations = bi;
     }
 
     public boolean exportArffFiles() {
@@ -40,6 +43,12 @@ public class BuildArff {
     private boolean exportArffFile(String building) {
         //get bssid list for building
         ArrayList<String> bssidList =  databaseHelper.getBssid(building);
+
+        //load in the buildingInformations
+        if(!buildingsInformations.addBuildingWithInfo(building, bssidList)) {
+            return false;
+        }
+
         //get room list for building
         ArrayList<String> roomList = databaseHelper.getRoomList(building);
 
@@ -53,14 +62,9 @@ public class BuildArff {
         } else {
             parser = new ARFFParser(fileName + "_" + building + ".arff", destinationPath);
         }
-
-
         computeAttributes(parser, bssidList, roomList);
 
 
-        //String[MAC1_SSID, MAC2_SSID, MAC3_SSID, ..., class] for each experiment
-        //String[] train =  new String[bssidList.size() + 1];
-        LinkedHashMap<String, String> measures = null;
 
         //Access room [Building]
         for(String room: roomList) {
@@ -69,31 +73,20 @@ public class BuildArff {
 
             //Access sample (collection of measurements) [Building [Room]]
             for(String experimentId: experimentsId) {
-                //Arrays.fill(train, "0");
-                //train[train.length - 1] = room;
-
+                //String[MAC1_SSID, MAC2_SSID, MAC3_SSID, ..., class] for each experiment
+                LinkedHashMap<String, String> measures;
                 measures = databaseHelper.getMeasurments(experimentId);
 
                 //Access measurement [Building [Room [Ssmple]]]
-                /*for(String bssid: measures.keySet()){
-                    String rssi = measures.get(bssid);
-
-                    //insert measure in the array
-                    int index = getIndex(bssidList, bssid);
-                    if(index < 0) {
-                        return false;
-                    }
-                    if(!rssi.equals("")) {  //maintain zero in the array in case of null value in the array
-                        train[index] = rssi;
-                    }
-                }*/
-
                 String[] train = computeMeasurementArray(measures, bssidList, room);
+                if(train == null) {
+                    return false;
+                }
+
                 //parse the array in the arff file
                 parser.writeDataRow(train);
             }
         }
-
 
         parser.closeFile();
         return true;
