@@ -81,4 +81,14 @@ public class ServerHelper {
         }
         return ret;
     }
+
+    public void closeClient(){
+        try {
+            in.close();
+            out.close();
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

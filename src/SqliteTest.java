@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 public class SqliteTest {
     public static void main( String args[] )
     {
-
+        /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
         //merge and generate arff files
         String basePath = "C:\\resources\\";
 
@@ -23,7 +23,7 @@ public class SqliteTest {
         BuildArff ba = new BuildArff(dh, "baruffa", bi, basePath);
         ba.exportArffFiles();
 
-
+        /*
         //testing the classifier
         LinkedHashMap<String, String> sample;       //need to initialized
         //find the building by searching for the first bssid in sample
@@ -31,8 +31,8 @@ public class SqliteTest {
         ArrayList<String> bssid = bi.getBssidList(building);
         String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
 
-        System.out.println("VIsual check of created sample: \n" + trainArray.toString());
-
+        System.out.println("Visual check of created sample: \n" + trainArray.toString());
+        */
 
 
         /*-----------------------------------TEST CLASSE ClassifierService
@@ -45,15 +45,32 @@ public class SqliteTest {
         */
 
 
-        /*-----------------------------------TEST CLASSE ServerHelper con lato client
+        /*-----------------------------------TEST CLASSE ServerHelper con lato client*/
+
+        ClassifierService cls = new ClassifierService();
+        cls.buildClassifier(basePath + "baruffa_casa-silvia.arff");
+
         ServerHelper socket = new ServerHelper(8888);
         System.out.println("Server is listening");
-        if(socket.acceptNewClient()){
+        while(socket.acceptNewClient()){
             System.out.println("New client is arrived!");
-            LinkedHashMap<String, String> prova = socket.readClientRecord();
-            System.out.println(prova.toString());
-            socket.writeSingleLine("Sei qui");
+            LinkedHashMap<String, String> sample = socket.readClientRecord();
+            System.out.println(sample.toString());
+
+
+            //find the building by searching for the first bssid in sample
+            String building = bi.getBuilding(sample.keySet().iterator().next());
+            ArrayList<String> bssid = bi.getBssidList(building);
+            String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
+
+            System.out.println("Visual check of created sample:");
+            for(String str : trainArray)
+                System.out.print(str + " ");
+            String result = cls.classify(trainArray);
+            socket.writeSingleLine(result);
+            System.out.println("Server response: " + result);
+            socket.closeClient();
         }
-        */
+
     }
 }
