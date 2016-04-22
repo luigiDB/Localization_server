@@ -47,6 +47,7 @@ public class SqliteTest {
 
         /*-----------------------------------TEST CLASSE ServerHelper con lato client*/
 
+        //TODO: this must be changed and need to pickup the correct arff file based on building
         ClassifierService cls = new ClassifierService();
         cls.buildClassifier(basePath + "baruffa_casa-silvia.arff");
 
@@ -60,6 +61,11 @@ public class SqliteTest {
 
             //find the building by searching for the first bssid in sample
             String building = bi.getBuilding(sample.keySet().iterator().next());
+
+            //TODO: take here the classifier
+            //path in this form " fileName + "_" + building + ".arff" "
+            //where in this case filename = "baruffa"
+
             ArrayList<String> bssid = bi.getBssidList(building);
             String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
 
