@@ -1,9 +1,3 @@
-import weka.classifiers.Classifier;
-import weka.classifiers.lazy.IBk;
-import weka.core.Instance;
-import weka.core.Instances;
-
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 /**
@@ -15,12 +9,13 @@ public class SqliteTest {
         /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
         //merge and generate arff files
         String basePath = "C:\\resources\\";
+        String baseName = "baruffa";
 
         DatabaseHelper dh = new DatabaseHelper(basePath);
 
         //export arff files
         BuildingsInformations bi = new BuildingsInformations();
-        BuildArff ba = new BuildArff(dh, "baruffa", bi, basePath);
+        BuildArff ba = new BuildArff(dh, baseName, bi, basePath);
         ba.exportArffFiles();
 
         /*
@@ -51,6 +46,24 @@ public class SqliteTest {
         ClassifierService cls = new ClassifierService();
         cls.buildClassifier(basePath + "baruffa_casa-silvia.arff");
 
+        //list method
+        ArrayList<ClassifierService> clsList = new ArrayList<>();
+        LinkedHashMap<String, Integer> buildingIndexes = new LinkedHashMap<>();
+        ClassifierService temp;
+        int counter = 0;
+        for(String building: bi.getBuildingList()) {
+            //create classifier
+            temp = new ClassifierService();
+            temp.buildClassifier(basePath + baseName + "_" + building + ".arff");
+
+            //add classifier
+            clsList.add(temp);
+
+            //add building index
+            buildingIndexes.put(building, counter);
+            counter += 1;
+        }
+
         ServerHelper socket = new ServerHelper(8888);
         System.out.println("Server is listening");
         while(socket.acceptNewClient()){
@@ -61,18 +74,22 @@ public class SqliteTest {
 
             //find the building by searching for the first bssid in sample
             String building = bi.getBuilding(sample.keySet().iterator().next());
-
-            //TODO: take here the classifier
-            //path in this form " fileName + "_" + building + ".arff" "
-            //where in this case filename = "baruffa"
-
             ArrayList<String> bssid = bi.getBssidList(building);
             String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
 
             System.out.println("Visual check of created sample:");
+            assert trainArray != null;
             for(String str : trainArray)
                 System.out.print(str + " ");
-            String result = cls.classify(trainArray);
+
+
+            //This need to the checked
+            int index = buildingIndexes.get(building);
+            String result = clsList.get(index).classify(trainArray);
+
+            //original version
+            //String result = cls.classify(trainArray);
+
             socket.writeSingleLine(result);
             System.out.println("Server response: " + result);
             socket.closeClient();
