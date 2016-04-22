@@ -5,10 +5,20 @@ import java.util.LinkedHashMap;
  * Created by luigi on 19/04/2016.
  */
 public class BuildingsInformations {
-    LinkedHashMap<String, ArrayList<String>> buildings;
+    private LinkedHashMap<String, ArrayList<String>> buildings;
+
 
     public BuildingsInformations() {
         buildings = new LinkedHashMap<>();
+    }
+
+
+    public ArrayList<String> getBuildingList() {
+        ArrayList<String> temp = new ArrayList<>();
+        for(String b: buildings.keySet()) {
+            temp.add(b);
+        }
+        return temp;
     }
 
     public boolean addBuildingWithInfo(String building, ArrayList<String> bssidList) {
@@ -40,11 +50,12 @@ public class BuildingsInformations {
 
 
     private boolean checkIfBuildingExist(String building) {
-        for(String b: buildings.keySet()){
+        return buildings.containsKey(building);
+        /*for(String b: buildings.keySet()){
             if(b.equals(building)) {
                 return true;
             }
         }
-        return false;
+        return false;*/
     }
 }
