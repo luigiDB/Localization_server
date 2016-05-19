@@ -1,5 +1,6 @@
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -29,7 +30,8 @@ public class ClassifierService {
             data = source.getDataSet();
             data.setClassIndex(data.numAttributes() - 1);
             //Build the classifier
-            cls = new IBk();
+            //cls = new IBk();
+            cls = new RandomForest();
             cls.buildClassifier(data);
             //Save class values into a string array
             classes = new String[data.classAttribute().numValues()];

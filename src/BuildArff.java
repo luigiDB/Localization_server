@@ -41,6 +41,7 @@ public class BuildArff {
     }
 
     private boolean exportArffFile(String building) {
+        System.out.println("EXPORT: " + building);
         //get bssid list for building
         ArrayList<String> bssidList =  databaseHelper.getBssid(building);
         //load in the buildingInformations

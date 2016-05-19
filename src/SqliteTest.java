@@ -43,9 +43,10 @@ public class SqliteTest {
         /*-----------------------------------TEST CLASSE ServerHelper con lato client*/
 
         //TODO: this must be changed and need to pickup the correct arff file based on building
+        /*
         ClassifierService cls = new ClassifierService();
-        cls.buildClassifier(basePath + "baruffa_casa-silvia.arff");
-
+        cls.buildClassifier(basePath + "baruffa_casa-giulio.arff");
+        */
         //list method
         ArrayList<ClassifierService> clsList = new ArrayList<>();
         LinkedHashMap<String, Integer> buildingIndexes = new LinkedHashMap<>();
