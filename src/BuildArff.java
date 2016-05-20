@@ -54,7 +54,7 @@ public class BuildArff {
         //get bssid list for building
         ArrayList<String> bssidList =  databaseHelper.getBssid(building);
         //load in the buildingInformations
-        if(!buildingsInformations.addBuildingWithInfo(building.replaceAll(" ", "&"), bssidList)) {
+        if(!buildingsInformations.addBuildingWithInfo(building, bssidList)) {
             return false;
         }
 
