@@ -28,8 +28,17 @@ public class BuildArff {
     }
 
     public boolean exportArffFiles() {
+        System.out.println("exportArffFiles");
+
+        //be sure that there is only one db
+        if(databaseHelper.mergeDb() != 1) {
+            return false;
+        }
+
         //get buildings
         ArrayList<String> buildings = databaseHelper.getBuildings();
+        System.out.println(buildings.toString());
+        System.out.println("\n");
         boolean res = true;
         for(String building: buildings) {
             res = exportArffFile(building);
@@ -45,18 +54,19 @@ public class BuildArff {
         //get bssid list for building
         ArrayList<String> bssidList =  databaseHelper.getBssid(building);
         //load in the buildingInformations
-        if(!buildingsInformations.addBuildingWithInfo(building, bssidList)) {
+        if(!buildingsInformations.addBuildingWithInfo(building.replaceAll(" ", "&"), bssidList)) {
             return false;
         }
 
         //get room list for building
         ArrayList<String> roomList = databaseHelper.getRoomList(building);
         //roomList may contains spaces that need to filled with -
+        System.out.println("roomlist 1: " + roomList.toString());
         replaceString(roomList, " ", "-");
-
-        if(databaseHelper.mergeDb() != 1) {
-            return false;
-        }
+        System.out.println("roomlist 2: " + roomList.toString());
+//        if(databaseHelper.mergeDb() != 1) {
+//            return false;
+//        }
 
         ARFFParser parser;
         if(destinationPath == null) {
@@ -71,7 +81,7 @@ public class BuildArff {
         //Access room [Building]
         for(String room: roomList) {
             String[] roomPosition = room.split("_");
-            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0], roomPosition[1], roomPosition[2]);
+            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0].replaceAll("-", " "), roomPosition[1], roomPosition[2]);
 
             //Access sample (collection of measurements) [Building [Room]]
             for(String experimentId: experimentsId) {
@@ -151,8 +161,11 @@ public class BuildArff {
     }
 
     private void replaceString(ArrayList<String> list, String originChar, String newChar) {
-        for(String elem: list) {
-            elem.replaceAll(originChar, newChar);
+        /*for(String elem: list) {
+            elem = elem.replaceAll(originChar, newChar);
+        }*/
+        for (int i = 0; i < list.size(); i++) {
+            list.set(i, list.get(i).replaceAll(originChar, newChar));
         }
     }
 }
