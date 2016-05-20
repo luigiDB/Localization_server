@@ -1,7 +1,5 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 /**
@@ -58,11 +56,11 @@ public class BuildArff {
             return false;
         }
 
-        ARFFParser parser;
+        FileWriter parser;
         if(destinationPath == null) {
-            parser = new ARFFParser(fileName + "_" + building + ".arff");
+            parser = new FileWriter(fileName + "_" + building + ".arff");
         } else {
-            parser = new ARFFParser(fileName + "_" + building + ".arff", destinationPath);
+            parser = new FileWriter(fileName + "_" + building + ".arff", destinationPath);
         }
         computeAttributes(parser, bssidList, roomList);
 
@@ -117,7 +115,7 @@ public class BuildArff {
         return train;
     }
 
-    private void computeAttributes(ARFFParser parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
+    private void computeAttributes(FileWriter parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
         LinkedHashMap<String, String> attributeList = new LinkedHashMap<>();
         for(String bssid: bssidList) {
             attributeList.put(bssid, "real");

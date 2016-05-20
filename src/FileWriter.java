@@ -5,7 +5,6 @@
  */
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -16,13 +15,14 @@ import java.util.logging.Logger;
  *
  * @author Giulio
  */
-public class ARFFParser {
+public class FileWriter {
+    private int offset;
     private File file;
     private String FileName;
     private String FolderPath;
-    private FileWriter fb;
+    private java.io.FileWriter fb;
 
-    public ARFFParser(String FileName) {
+    public FileWriter(String FileName) {
         if(FileName == null){
             System.err.println("ARRFParser: bad parameter");
             return;
@@ -34,7 +34,7 @@ public class ARFFParser {
         //Create the file
         createFile();
     }
-    public ARFFParser(String FileName, String FolderPath) {
+    public FileWriter(String FileName, String FolderPath) {
         if(FileName == null && FolderPath == null){
             System.err.println("ARRFParser: bad parameters");
             return;
@@ -44,8 +44,20 @@ public class ARFFParser {
         this.FolderPath = FolderPath;
         this.file = null;
         this.fb = null;
+        this.offset = 0;
         //Create the file
         createFile();
+    }
+
+    public boolean saveFile(char[] fileByte){
+        try {
+            fb.write(fileByte,offset, fileByte.length);
+            offset += fileByte.length;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
     
     private void createFile(){
@@ -71,9 +83,9 @@ public class ARFFParser {
                 System.err.println("ARRFParser: error in creating the file");
             }
  
-            fb = new FileWriter(file);
+            fb = new java.io.FileWriter(file);
         } catch (IOException ex) {
-            Logger.getLogger(ARFFParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -91,7 +103,7 @@ public class ARFFParser {
             }
             fb.write("@DATA\n");
         } catch (IOException ex) {
-            Logger.getLogger(ARFFParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         } 
         return true;
     }
@@ -107,7 +119,7 @@ public class ARFFParser {
                     fb.write(",");
             }
         } catch (IOException ex) {
-            Logger.getLogger(ARFFParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
     }
@@ -116,7 +128,7 @@ public class ARFFParser {
         try {
             fb.close();
         } catch (IOException ex) {
-            Logger.getLogger(ARFFParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
     }
@@ -125,7 +137,7 @@ public class ARFFParser {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        ARFFParser prova = new ARFFParser("prova.txt", ".");
+        FileWriter prova = new FileWriter("prova.txt", ".");
         LinkedHashMap<String,String> attributes = new LinkedHashMap<>();
         attributes.put("ap1", "REAL");
         attributes.put("ap3", "REAL");
