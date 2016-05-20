@@ -9,7 +9,7 @@ public class SqliteTest {
         /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
         //merge and generate arff files
         String basePath = "C:\\resources\\";
-        String baseName = "baruffa";
+        String baseName = "base";
 
         DatabaseHelper dh = new DatabaseHelper(basePath);
 

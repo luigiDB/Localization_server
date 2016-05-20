@@ -209,7 +209,7 @@ public class DatabaseHelper {
 
 
     public LinkedHashMap<String, String> getMeasurments(String experiment) {
-        System.out.println("getMeasurments");
+        //System.out.println("getMeasurments");
         File fileDb = getDbList()[0];
         LinkedHashMap<String, String> res = new LinkedHashMap<>();
         try {

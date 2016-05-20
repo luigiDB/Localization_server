@@ -124,7 +124,7 @@ public class ARFFParser {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         ARFFParser prova = new ARFFParser("prova.txt", ".");
         LinkedHashMap<String,String> attributes = new LinkedHashMap<>();
         attributes.put("ap1", "REAL");
@@ -134,6 +134,6 @@ public class ARFFParser {
         String[] values = {"-82","-54","-62"};
         prova.writeDataRow(values);
         prova.closeFile();
-    }
+    }*/
     
 }
