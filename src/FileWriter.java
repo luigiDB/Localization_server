@@ -59,7 +59,7 @@ public class FileWriter {
         }
         return true;
     }
-    
+
     private void createFile(){
         try {
             file = new File(FolderPath, FileName);
@@ -136,6 +136,7 @@ public class FileWriter {
     /**
      * @param args the command line arguments
      */
+    /*
     public static void main(String[] args) {
         FileWriter prova = new FileWriter("prova.txt", ".");
         LinkedHashMap<String,String> attributes = new LinkedHashMap<>();
@@ -146,6 +147,6 @@ public class FileWriter {
         String[] values = {"-82","-54","-62"};
         prova.writeDataRow(values);
         prova.closeFile();
-    }
+    }*/
     
 }

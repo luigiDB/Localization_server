@@ -9,7 +9,7 @@ public class SqliteTest {
         /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
         //merge and generate arff files
         String basePath = "C:\\resources\\";
-        String baseName = "baruffa";
+        String baseName = "base";
 
         DatabaseHelper dh = new DatabaseHelper(basePath);
 
@@ -53,9 +53,9 @@ public class SqliteTest {
         ClassifierService temp;
         int counter = 0;
         for(String building: bi.getBuildingList()) {
-            //create classifier
+            System.out.println("create classifier for: " + building);
             temp = new ClassifierService();
-            temp.buildClassifier(basePath + baseName + "_" + building + ".arff");
+            temp.buildClassifier(basePath + baseName + "_" + building.replaceAll(" ", "-") + ".arff");
 
             //add classifier
             clsList.add(temp);
