@@ -24,19 +24,24 @@ public class DbServerThread extends Thread{
             System.out.println("New contribution is arrived!");
             //retrieve the name
             String fileName = socket.readSingleLine();
+            System.out.println("RECEIVED: " + fileName);
             //create the file handler object
             FileWriter fileHandler = new FileWriter(fileName, basePath);
             //now read the file dimension
             int dimFile = Integer.parseInt(socket.readSingleLine());
-            char[] temp;
+            System.out.println("RECEIVED: " + dimFile);
+            byte[] temp;
             //now read the file from the socket and save in the file
             while(dimFile > 0){
-                temp = socket.readSingleLine().toCharArray();
+                temp = socket.readCharBuf(dimFile);
                 fileHandler.saveFile(temp);
                 dimFile -= temp.length;
             }
-            fileHandler.closeFile();
             socket.closeClient();
+            fileHandler.closeFile();
+            //-------------TESTING
+            break;
         }
     }
+
 }

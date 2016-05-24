@@ -4,8 +4,7 @@
  * and open the template in the editor.
  */
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -20,6 +19,7 @@ public class FileWriter {
     private File file;
     private String FileName;
     private String FolderPath;
+    private BufferedOutputStream fb_byte;
     private java.io.FileWriter fb;
 
     public FileWriter(String FileName) {
@@ -49,11 +49,12 @@ public class FileWriter {
         createFile();
     }
 
-    public boolean saveFile(char[] fileByte){
+    public boolean saveFile(byte[] fileByte){
         try {
-            fb.write(fileByte,offset, fileByte.length);
-            offset += fileByte.length;
-        } catch (IOException e) {
+            fb_byte.write(fileByte,offset, fileByte.length);
+            //offset += fileByte.length;
+        } catch (Exception e) {
+            System.out.println(offset + " " + fileByte.length);
             e.printStackTrace();
             return false;
         }
@@ -83,6 +84,7 @@ public class FileWriter {
                 System.err.println("ARRFParser: error in creating the file");
             }
  
+            fb_byte = new BufferedOutputStream(new FileOutputStream(file));
             fb = new java.io.FileWriter(file);
         } catch (IOException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
@@ -126,6 +128,9 @@ public class FileWriter {
     
     public boolean closeFile(){
         try {
+            fb_byte.flush();
+            fb.flush();
+            fb_byte.close();
             fb.close();
         } catch (IOException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
