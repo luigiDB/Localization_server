@@ -9,6 +9,8 @@ public class DbServerThread extends Thread{
     private int Port;
     private String basePath;
     private ServerSocket socket;
+    private FileHelper fh;
+    private final int DIM_BUF = 1024;
 
     public DbServerThread(int port, String base) throws IOException {
         if(port <= 0 || base == null)
@@ -23,46 +25,34 @@ public class DbServerThread extends Thread{
 
 
     public void run(){
+        Socket actual;
+        byte[] message = new byte[DIM_BUF];
+        int length = 0;
+        int received = 0;
         System.out.println("Server is listening");
         try {
             while(true) {
-
-                Socket actual = socket.accept();
+                actual = socket.accept();
                 System.out.println("New contribution is arrived!");
-
-
-                String strFilePath = basePath + "file.db";
-                try {
-                    FileOutputStream fos = new FileOutputStream(strFilePath);
-                    //String strContent = "Write File using Java ";
-
-
-                    DataInputStream dIn = new DataInputStream(actual.getInputStream());
-
-                    int length = dIn.readInt();                    // read length of incoming message
-                    if(length>0) {
-                        byte[] message = new byte[length];
-                        dIn.readFully(message, 0, message.length); // read the message
-                        fos.write(message);
-                        fos.close();
-                    }
-
-
-                }
-                catch(FileNotFoundException ex)   {
-                    System.out.println("FileNotFoundException : " + ex);
-                }
-                catch(IOException ioe)  {
-                    System.out.println("IOException : " + ioe);
+                //TODO: find a better naming system
+                fh = new FileHelper("file.db", basePath);
+                DataInputStream dIn = new DataInputStream(actual.getInputStream());
+                //Read the file size
+                length = dIn.readInt();
+                while(length > received) {
+                    received += dIn.read(message);
+                    fh.saveFile(message, received);
                 }
 
                 actual.close();
+                break;
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
                 socket.close();
+                fh.closeFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }

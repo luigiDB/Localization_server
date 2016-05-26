@@ -1,6 +1,4 @@
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -9,7 +7,7 @@ import java.net.Socket;
 public class TestMain {
 
     public final static int SOCKET_PORT = 13267;  // you may change this
-    public final static String FILE_TO_SEND = "C:\\resources\\BackupDB_Giulio_casa.db";  // you may change this
+    public final static String FILE_TO_SEND = "C:\\Users\\Giulio\\Desktop\\BackupDB_Giulio_casa.db";  // you may change this
 
     public static void main(String args[]) throws IOException {
 
@@ -29,12 +27,6 @@ public class TestMain {
                 try {
                     FileInputStream fileInputStream = new FileInputStream(file);
                     fileInputStream.read(b);
-                    for (int i = 0; i < b.length; i++) {
-                        System.out.print((char)b[i]);
-                    }
-
-                    OutputStream os = sock.getOutputStream();
-
 
                     DataOutputStream dOut = new DataOutputStream(sock.getOutputStream());
 

@@ -14,15 +14,14 @@ import java.util.logging.Logger;
  *
  * @author Giulio
  */
-public class FileWriter {
-    private int offset;
+public class FileHelper {
     private File file;
     private String FileName;
     private String FolderPath;
-    private BufferedOutputStream fb_byte;
-    private java.io.FileWriter fb;
+    private FileOutputStream fbOut;
+    private FileWriter fb;
 
-    public FileWriter(String FileName) {
+    public FileHelper(String FileName) {
         if(FileName == null){
             System.err.println("ARRFParser: bad parameter");
             return;
@@ -34,7 +33,7 @@ public class FileWriter {
         //Create the file
         createFile();
     }
-    public FileWriter(String FileName, String FolderPath) {
+    public FileHelper(String FileName, String FolderPath) {
         if(FileName == null && FolderPath == null){
             System.err.println("ARRFParser: bad parameters");
             return;
@@ -44,17 +43,14 @@ public class FileWriter {
         this.FolderPath = FolderPath;
         this.file = null;
         this.fb = null;
-        this.offset = 0;
         //Create the file
         createFile();
     }
 
-    public boolean saveFile(byte[] fileByte){
+    public boolean saveFile(byte[] fileByte, int dim){
         try {
-            fb_byte.write(fileByte,offset, fileByte.length);
-            //offset += fileByte.length;
+            fbOut.write(fileByte);
         } catch (Exception e) {
-            System.out.println(offset + " " + fileByte.length);
             e.printStackTrace();
             return false;
         }
@@ -84,8 +80,8 @@ public class FileWriter {
                 System.err.println("ARRFParser: error in creating the file");
             }
  
-            fb_byte = new BufferedOutputStream(new FileOutputStream(file));
-            fb = new java.io.FileWriter(file);
+            fbOut = new FileOutputStream(file);
+            fb = new FileWriter(file);
         } catch (IOException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -128,9 +124,9 @@ public class FileWriter {
     
     public boolean closeFile(){
         try {
-            fb_byte.flush();
+            fbOut.flush();
             fb.flush();
-            fb_byte.close();
+            fbOut.close();
             fb.close();
         } catch (IOException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
