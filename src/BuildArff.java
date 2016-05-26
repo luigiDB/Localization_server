@@ -68,11 +68,11 @@ public class BuildArff {
 //            return false;
 //        }
 
-        FileWriter parser;
+        FileHelper parser;
         if(destinationPath == null) {
-            parser = new FileWriter(fileName + "_" + building + ".arff");
+            parser = new FileHelper(fileName + "_" + building + ".arff");
         } else {
-            parser = new FileWriter(fileName + "_" + building + ".arff", destinationPath);
+            parser = new FileHelper(fileName + "_" + building + ".arff", destinationPath);
         }
         computeAttributes(parser, bssidList, roomList);
 
@@ -127,7 +127,7 @@ public class BuildArff {
         return train;
     }
 
-    private void computeAttributes(FileWriter parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
+    private void computeAttributes(FileHelper parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
         LinkedHashMap<String, String> attributeList = new LinkedHashMap<>();
         for(String bssid: bssidList) {
             attributeList.put(bssid, "real");
