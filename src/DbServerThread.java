@@ -1,4 +1,6 @@
-import java.io.File;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * Created by Giulio on 19/05/2016.
@@ -6,41 +8,64 @@ import java.io.File;
 public class DbServerThread extends Thread{
     private int Port;
     private String basePath;
-    private ServerHelper socket;
+    private ServerSocket socket;
 
-    public DbServerThread(int port, String base){
+    public DbServerThread(int port, String base) throws IOException {
         if(port <= 0 || base == null)
             return;
         this.Port = port;
         this.basePath = base;
         //Create the server socket object
-        this.socket = new ServerHelper(Port);
+        this.socket = new ServerSocket(Port);
+        socket.setReuseAddress(true);
         start();
     }
 
+
     public void run(){
         System.out.println("Server is listening");
-        while(socket.acceptNewClient()) {
-            System.out.println("New contribution is arrived!");
-            //retrieve the name
-            String fileName = socket.readSingleLine();
-            System.out.println("RECEIVED: " + fileName);
-            //create the file handler object
-            FileWriter fileHandler = new FileWriter(fileName, basePath);
-            //now read the file dimension
-            int dimFile = Integer.parseInt(socket.readSingleLine());
-            System.out.println("RECEIVED: " + dimFile);
-            byte[] temp;
-            //now read the file from the socket and save in the file
-            while(dimFile > 0){
-                temp = socket.readCharBuf(dimFile);
-                fileHandler.saveFile(temp);
-                dimFile -= temp.length;
+        try {
+            while(true) {
+
+                Socket actual = socket.accept();
+                System.out.println("New contribution is arrived!");
+
+
+                String strFilePath = basePath + "file.db";
+                try {
+                    FileOutputStream fos = new FileOutputStream(strFilePath);
+                    //String strContent = "Write File using Java ";
+
+
+                    DataInputStream dIn = new DataInputStream(actual.getInputStream());
+
+                    int length = dIn.readInt();                    // read length of incoming message
+                    if(length>0) {
+                        byte[] message = new byte[length];
+                        dIn.readFully(message, 0, message.length); // read the message
+                        fos.write(message);
+                        fos.close();
+                    }
+
+
+                }
+                catch(FileNotFoundException ex)   {
+                    System.out.println("FileNotFoundException : " + ex);
+                }
+                catch(IOException ioe)  {
+                    System.out.println("IOException : " + ioe);
+                }
+
+                actual.close();
             }
-            socket.closeClient();
-            fileHandler.closeFile();
-            //-------------TESTING
-            break;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
