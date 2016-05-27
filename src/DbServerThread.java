@@ -39,9 +39,11 @@ public class DbServerThread extends Thread{
                 DataInputStream dIn = new DataInputStream(actual.getInputStream());
                 //Read the file size
                 length = dIn.readInt();
-                while(length > received) {
-                    received += dIn.read(message);
+                System.out.println(length);
+                while(length > 0) {
+                    received = dIn.read(message);
                     fh.saveFile(message, received);
+                    length -= received;
                 }
 
                 actual.close();

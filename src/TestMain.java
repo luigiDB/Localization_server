@@ -13,7 +13,7 @@ public class TestMain {
 
         DbServerThread test = new DbServerThread(8000, "C:\\resources\\");
 
-
+/*
         Socket sock = null;
         try {
             sock = new Socket("127.0.0.1", 8000);
@@ -49,6 +49,7 @@ public class TestMain {
         } finally {
             if (sock != null) sock.close();
         }
+*/
     }
 }
 

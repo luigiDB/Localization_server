@@ -49,7 +49,7 @@ public class FileHelper {
 
     public boolean saveFile(byte[] fileByte, int dim){
         try {
-            fbOut.write(fileByte);
+            fbOut.write(fileByte, 0, dim);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
