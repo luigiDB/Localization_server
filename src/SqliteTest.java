@@ -4,6 +4,52 @@ import java.util.LinkedHashMap;
  * Created by luigi on 12/04/2016.
  */
 public class SqliteTest {
+
+    private static LinkedHashMap<String, Integer> buildingIndexes;
+    private static ArrayList<ClassifierService> clsList;
+    private static BuildingsInformations bi;
+    private static int NUM_SAMPLES = 5;
+
+    public static String ClassificationProcess(LinkedHashMap<String, String> sample){
+        //find the building by searching for the first bssid in sample
+        String building = bi.getBuilding(sample.keySet().iterator().next());
+        System.out.println("Selected building: " + building);
+        ArrayList<String> bssid = bi.getBssidList(building);
+        String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
+
+        System.out.println("Visual check of created sample:");
+        assert trainArray != null;
+        for(String str : trainArray)
+            System.out.print(str + " ");
+
+
+        //This need to the checked
+        int index = buildingIndexes.get(building);
+        String result = clsList.get(index).classify(trainArray);
+        return result;
+    }
+
+    private static String findMajority(String[] input) {
+        int[] occurrences = new int[input.length];
+        int indexMax = 0;
+        int maxValue = 0;
+        double confidenceLevel = 0;
+        for(int i = 0; i < input.length; i++){
+            for(int j = i + 1; j < input.length; j++){
+                if(input[i].equals(input[j]))
+                    occurrences[i]++;
+            }
+        }
+        for(int i = 0; i < input.length; i++){
+            if(occurrences[i] > maxValue){
+                maxValue = occurrences[i];
+                indexMax = i;
+            }
+        }
+        confidenceLevel = ((double)maxValue / (double)input.length) * 100;
+        return input[indexMax] + "\t" +  confidenceLevel + "%";
+    }
+
     public static void main( String args[] )
     {
         /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
@@ -14,7 +60,7 @@ public class SqliteTest {
         DatabaseHelper dh = new DatabaseHelper(basePath);
 
         //export arff files
-        BuildingsInformations bi = new BuildingsInformations();
+        bi = new BuildingsInformations();
         BuildArff ba = new BuildArff(dh, baseName, bi, basePath);
         ba.exportArffFiles();
 
@@ -48,8 +94,8 @@ public class SqliteTest {
         cls.buildClassifier(basePath + "baruffa_casa-giulio.arff");
         */
         //list method
-        ArrayList<ClassifierService> clsList = new ArrayList<>();
-        LinkedHashMap<String, Integer> buildingIndexes = new LinkedHashMap<>();
+        clsList = new ArrayList<>();
+        buildingIndexes = new LinkedHashMap<>();
         ClassifierService temp;
         int counter = 0;
         for(String building: bi.getBuildingList()) {
@@ -67,34 +113,24 @@ public class SqliteTest {
 
         ServerHelper socket = new ServerHelper(8888);
         System.out.println("Server is listening");
+        String[] results = new String[NUM_SAMPLES];
         while(socket.acceptNewClient()){
             System.out.println("New client is arrived!");
-            LinkedHashMap<String, String> sample = socket.readClientRecord();
-            System.out.println(sample.toString());
+            for(int i = 0; i < NUM_SAMPLES; i++) {
+                LinkedHashMap<String, String> sample = socket.readClientRecord();
+                System.out.println(sample.toString());
 
 
-            //find the building by searching for the first bssid in sample
-            String building = bi.getBuilding(sample.keySet().iterator().next());
-            ArrayList<String> bssid = bi.getBssidList(building);
-            String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
-
-            System.out.println("Visual check of created sample:");
-            assert trainArray != null;
-            for(String str : trainArray)
-                System.out.print(str + " ");
-
-
-            //This need to the checked
-            int index = buildingIndexes.get(building);
-            String result = clsList.get(index).classify(trainArray);
-
-            //original version
-            //String result = cls.classify(trainArray);
-
+                results[i] = ClassificationProcess(sample);
+                System.out.println(results[i]);
+            }
+            String result = findMajority(results);
             socket.writeSingleLine(result);
             System.out.println("Server response: " + result);
             socket.closeClient();
         }
 
     }
+
+
 }
