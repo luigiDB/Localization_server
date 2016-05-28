@@ -70,9 +70,9 @@ public class BuildArff {
 
         FileHelper parser;
         if(destinationPath == null) {
-            parser = new FileHelper(fileName + "_" + building + ".arff");
+            parser = new FileHelper(fileName + "_" + building.replace(" ", "-") + ".arff");
         } else {
-            parser = new FileHelper(fileName + "_" + building + ".arff", destinationPath);
+            parser = new FileHelper(fileName + "_" + building.replace(" ", "-") + ".arff", destinationPath);
         }
         computeAttributes(parser, bssidList, roomList);
 
