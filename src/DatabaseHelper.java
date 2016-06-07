@@ -33,10 +33,18 @@ public class DatabaseHelper {
     private static final String KEY_FREQUENCY = "frequency";
     private static final String KEY_RSSI = "rssi";
 
+    /**
+     * constructor
+     * @param path path of the dbs
+     */
     public DatabaseHelper(String path) {
         basePath = path;
     }
 
+    /**
+     * merge all file *.db in the folder in only one file
+     * @return 1: only one file remains, 0: some error in deleting a file, -1: some exception
+     */
     public int mergeDb(){
         System.out.println("MergeDb");
         File[] files = getDbList();
@@ -74,6 +82,10 @@ public class DatabaseHelper {
         return 1;
     }
 
+    /**
+     * return the list of the db in the folder
+     * @return list of File
+     */
     public File[] getDbList() {
         File dir = new File(basePath);
         File[] files = dir.listFiles(new FilenameFilter() {
@@ -84,6 +96,10 @@ public class DatabaseHelper {
         return files;
     }
 
+    /**
+     * return list of the buildings in the db
+     * @return null: some error in db connection, !null: an ArrayList<String> containing buildings
+     */
     public ArrayList<String> getBuildings() {
         System.out.println("getBuildings");
         File fileDb = getDbList()[0];
@@ -102,11 +118,17 @@ public class DatabaseHelper {
             connection.close();
         } catch (Exception e) {
             System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+            return null;
         }
 
         return res;
     }
 
+    /**
+     * return list of the bssid in the given building
+     * @param building name of the building (Must be exact)
+     * @return null: some error in db connection, !null: an ArrayList<String> containing bssid
+     */
     public ArrayList<String> getBssid(String building) {
         System.out.println("getBssid");
         File fileDb = getDbList()[0];
@@ -126,11 +148,16 @@ public class DatabaseHelper {
             connection.close();
         } catch (Exception e) {
             System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+            return null;
         }
 
         return res;
     }
 
+    /**
+     * return the number of buildings in the db
+     * @return -1: some error in db connection, !-1: number of buildings
+     */
     public int getNumberOfBuildings() {
         System.out.println("getNumberOfBuildings");
         File fileDb = getDbList()[0];
@@ -149,11 +176,17 @@ public class DatabaseHelper {
             connection.close();
         } catch (Exception e) {
             System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+            return -1;
         }
 
         return res;
     }
 
+    /**
+     * return list of the rooms in the given building
+     * @param building name of the building (Must be exact)
+     * @return null: some error in db connection, !null: an ArrayList<String> containing rooms => building_floor_room
+     */
     public ArrayList<String> getRoomList(String building) {
         System.out.println("getRoomList");
         File fileDb = getDbList()[0];
@@ -173,12 +206,19 @@ public class DatabaseHelper {
             connection.close();
         } catch (Exception e) {
             System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+            return null;
         }
 
         return res;
     }
 
-
+    /**
+     * return list of the experiments in the given building, room and floor
+     * @param building name of the building (Must be exact)
+     * @param floor name of the floor (Must be exact)
+     * @param room name of the room (Must be exact)
+     * @return null: some error in db connection, !null: an ArrayList<String> containing experiments
+     */
     public ArrayList<String> getExperiments(String building, String floor, String room) {
         System.out.println("getExperiments()");
         File fileDb = getDbList()[0];
@@ -202,12 +242,18 @@ public class DatabaseHelper {
             connection.close();
         } catch (Exception e) {
             System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+            return null;
         }
 
         return res;
     }
 
 
+    /**
+     * return list of the measurements in the given experiment
+     * @param experiment name of the experiment (Must be exact)
+     * @return null: some error in db connection, !null: an LinkedHashMap<String, String> containing measures
+     */
     public LinkedHashMap<String, String> getMeasurments(String experiment) {
         //System.out.println("getMeasurments");
         File fileDb = getDbList()[0];
@@ -228,6 +274,7 @@ public class DatabaseHelper {
             connection.close();
         } catch (Exception e) {
             System.err.println( "ERROR: " + e.getClass().getName() + ": " + e.getMessage() );
+            return null;
         }
 
         return res;
