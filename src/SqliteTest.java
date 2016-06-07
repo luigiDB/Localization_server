@@ -50,6 +50,7 @@ public class SqliteTest {
         return input[indexMax] + "\t" +  confidenceLevel + "%";
     }
 
+
     public static void main( String args[] )
     {
         /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/

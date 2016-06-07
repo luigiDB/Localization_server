@@ -14,6 +14,13 @@ public class BuildArff {
     private String fileName = null;
     private BuildingsInformations buildingsInformations;
 
+    /**
+     * constructor
+     * @param dh DatabaseHelper object
+     * @param name Arff file name
+     * @param bi BuildingsInformations object
+     * @param dest destination path
+     */
     public BuildArff(DatabaseHelper dh, String name, BuildingsInformations bi, String dest) {
         databaseHelper = dh;
         fileName = name;
@@ -21,12 +28,24 @@ public class BuildArff {
         buildingsInformations = bi;
     }
 
+
+    /**
+     * constructor
+     * @param dh DatabaseHelper object
+     * @param name Arff file name
+     * @param bi BuildingsInformations object
+     */
     public BuildArff(DatabaseHelper dh, String name, BuildingsInformations bi) {
         databaseHelper = dh;
         fileName = name;
         buildingsInformations = bi;
     }
 
+
+    /**
+     * export all the needed arff file one for each building
+     * @return true: no error, false. otherwise
+     */
     public boolean exportArffFiles() {
         System.out.println("exportArffFiles");
 
@@ -48,6 +67,7 @@ public class BuildArff {
         }
         return res;
     }
+
 
     private boolean exportArffFile(String building) {
         System.out.println("EXPORT: " + building);
@@ -104,6 +124,7 @@ public class BuildArff {
         return true;
     }
 
+
     public static String[] computeMeasurementArray(LinkedHashMap<String, String> measures, ArrayList<String> bssidList, String room) {
         String[] train =  new String[bssidList.size() + 1];
         Arrays.fill(train, "0");
@@ -127,6 +148,7 @@ public class BuildArff {
         return train;
     }
 
+
     private void computeAttributes(FileHelper parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
         LinkedHashMap<String, String> attributeList = new LinkedHashMap<>();
         for(String bssid: bssidList) {
@@ -137,6 +159,7 @@ public class BuildArff {
         //send to parser
         parser.setAttributes(attributeList);
     }
+
 
     private String computeClassValues(ArrayList<String> roomList) {
         String nominalValue = "{";
@@ -151,6 +174,7 @@ public class BuildArff {
         return nominalValue;
     }
 
+
     private static int getIndex(ArrayList<String> list, String elem) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).equalsIgnoreCase(elem)) {
@@ -159,6 +183,7 @@ public class BuildArff {
         }
         return -1;
     }
+
 
     private void replaceString(ArrayList<String> list, String originChar, String newChar) {
         /*for(String elem: list) {

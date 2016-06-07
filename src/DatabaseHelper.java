@@ -41,6 +41,7 @@ public class DatabaseHelper {
         basePath = path;
     }
 
+
     /**
      * merge all file *.db in the folder in only one file
      * @return 1: only one file remains, 0: some error in deleting a file, -1: some exception
@@ -82,6 +83,7 @@ public class DatabaseHelper {
         return 1;
     }
 
+
     /**
      * return the list of the db in the folder
      * @return list of File
@@ -95,6 +97,7 @@ public class DatabaseHelper {
         });
         return files;
     }
+
 
     /**
      * return list of the buildings in the db
@@ -123,6 +126,7 @@ public class DatabaseHelper {
 
         return res;
     }
+
 
     /**
      * return list of the bssid in the given building
@@ -154,6 +158,7 @@ public class DatabaseHelper {
         return res;
     }
 
+
     /**
      * return the number of buildings in the db
      * @return -1: some error in db connection, !-1: number of buildings
@@ -181,6 +186,7 @@ public class DatabaseHelper {
 
         return res;
     }
+
 
     /**
      * return list of the rooms in the given building
@@ -211,6 +217,7 @@ public class DatabaseHelper {
 
         return res;
     }
+
 
     /**
      * return list of the experiments in the given building, room and floor
