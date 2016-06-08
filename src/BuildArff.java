@@ -27,6 +27,10 @@ public class BuildArff {
      * @param dest destination path
      */
     public BuildArff(DatabaseHelper dh, String name, BuildingsInformations bi, String dest) {
+        if(dh==null || name==null || bi==null || dest==null) {
+            System.err.println("BuildArff: bad parameters");
+            return;
+        }
         databaseHelper = dh;
         fileName = name;
         destinationPath = dest;
@@ -41,6 +45,10 @@ public class BuildArff {
      * @param bi BuildingsInformations object
      */
     public BuildArff(DatabaseHelper dh, String name, BuildingsInformations bi) {
+        if(dh==null || name==null || bi==null) {
+            System.err.println("BuildArff: bad parameters");
+            return;
+        }
         databaseHelper = dh;
         fileName = name;
         buildingsInformations = bi;
@@ -94,9 +102,6 @@ public class BuildArff {
         System.out.println("roomlist 1: " + roomList.toString());
         replaceString(roomList, " ", "-");
         System.out.println("roomlist 2: " + roomList.toString());
-//        if(databaseHelper.mergeDb() != 1) {
-//            return false;
-//        }
 
         FileHelper parser;
         if(destinationPath == null) {
@@ -104,22 +109,21 @@ public class BuildArff {
         } else {
             parser = new FileHelper(fileName + "_" + building.replace(" ", "-") + ".arff", destinationPath);
         }
+        //TODO: room names in roomlist are filled with "-" since weka doesn't accept spaces but in the next step of this function i need to do the opposite so remember to move the replacing function to the computeAttributes function
         computeAttributes(parser, bssidList, roomList);
-
 
 
         //Access room [Building]
         for(String room: roomList) {
-            String[] roomPosition = room.split("_");
-            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0].replaceAll("-", " "), roomPosition[1], roomPosition[2]);
+            String[] roomPosition = room.split("_");        //building_floor_room
+            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0].replaceAll("-", " "), roomPosition[1], roomPosition[2]);    //building, floor, room name
 
             //Access sample (collection of measurements) [Building [Room]]
             for(String experimentId: experimentsId) {
                 //String[MAC1_SSID, MAC2_SSID, MAC3_SSID, ..., class] for each experiment
-                LinkedHashMap<String, String> measures;
-                measures = databaseHelper.getMeasurments(experimentId);
+                LinkedHashMap<String, String> measures = databaseHelper.getMeasurments(experimentId);
 
-                //Access measurement [Building [Room [Ssmple]]]
+                //Access measurement [Building [Room [Sample]]]
                 String[] train = computeMeasurementArray(measures, bssidList, room);
                 if(train == null) {
                     return false;
@@ -135,9 +139,19 @@ public class BuildArff {
     }
 
 
+    /**
+     * Compute a train sample for weka with all sensed value for each bssid in the building and the relative class
+     * @param measures LinkedHashMap of bssid and rssi
+     * @param bssidList list of all possible bssid
+     * @param room class
+     * @return null: bssid not found in bssidlist (logical error state that should not exist), !null: train string for weka
+     */
     public static String[] computeMeasurementArray(LinkedHashMap<String, String> measures, ArrayList<String> bssidList, String room) {
+        // allocate an array lenght able to contain all bssid and one class
         String[] train =  new String[bssidList.size() + 1];
         Arrays.fill(train, "0");
+
+        //fill the bssid cells
         for(String bssid: measures.keySet()){
             String rssi = measures.get(bssid);
 
@@ -151,6 +165,7 @@ public class BuildArff {
             }
         }
 
+        //fill the class cell
         if(room != null) {
             train[train.length - 1] = room;
         }
@@ -159,6 +174,12 @@ public class BuildArff {
     }
 
 
+    /**
+     * Compute first part of the arff file: attribute and class definition
+     * @param parser FileHelper
+     * @param bssidList ArrayList<String> of bssid
+     * @param roomList ArrayList<String> of rooms
+     */
     private void computeAttributes(FileHelper parser, ArrayList<String> bssidList, ArrayList<String> roomList) {
         LinkedHashMap<String, String> attributeList = new LinkedHashMap<>();
         for(String bssid: bssidList) {
@@ -171,6 +192,12 @@ public class BuildArff {
     }
 
 
+    /**
+     * given an ArrayList<String> return a string containing the elements of the ArrayList
+     * separated by , and enclosured by {}
+     * @param roomList ArrayList<String>
+     * @return String = {a, b, c}
+     */
     private String computeClassValues(ArrayList<String> roomList) {
         String nominalValue = "{";
         for(int i = 0 ; i < roomList.size() ; i++) {
@@ -185,6 +212,12 @@ public class BuildArff {
     }
 
 
+    /**
+     * Given a list and an element return the index of that element in the list
+     * @param list ArrayList<String>
+     * @param elem String representing the elem
+     * @return -1: elem not found in the list, >=0: index of the element in list
+     */
     private static int getIndex(ArrayList<String> list, String elem) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).equalsIgnoreCase(elem)) {
@@ -195,6 +228,12 @@ public class BuildArff {
     }
 
 
+    /**
+     * replace all originChar in an ArrayList<String> with newChar
+     * @param list list of strings where a string must be changed
+     * @param originChar character that must be found
+     * @param newChar character that must be replaced
+     */
     private void replaceString(ArrayList<String> list, String originChar, String newChar) {
         /*for(String elem: list) {
             elem = elem.replaceAll(originChar, newChar);

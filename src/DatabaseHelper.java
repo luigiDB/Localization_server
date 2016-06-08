@@ -42,6 +42,10 @@ public class DatabaseHelper {
      * @param path path of the dbs
      */
     public DatabaseHelper(String path) {
+        if(path == null) {
+            System.err.println("DatabaseHelper: bad parameters");
+            return;
+        }
         basePath = path;
     }
 
@@ -194,6 +198,7 @@ public class DatabaseHelper {
 
     /**
      * return list of the rooms in the given building
+     * each room is a string containing building, floor and name of the room separated by "_"
      * @param building name of the building (Must be exact)
      * @return null: some error in db connection, !null: an ArrayList<String> containing rooms => building_floor_room
      */
@@ -263,7 +268,7 @@ public class DatabaseHelper {
     /**
      * return list of the measurements in the given experiment
      * @param experiment name of the experiment (Must be exact)
-     * @return null: some error in db connection, !null: an LinkedHashMap<String, String> containing measures
+     * @return null: some error in db connection, !null: an LinkedHashMap<bssid, rssi> containing measures
      */
     public LinkedHashMap<String, String> getMeasurments(String experiment) {
         //System.out.println("getMeasurments");

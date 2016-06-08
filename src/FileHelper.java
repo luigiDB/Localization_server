@@ -38,6 +38,8 @@ public class FileHelper {
         //Create the file
         createFile();
     }
+
+
     public FileHelper(String FileName, String FolderPath) {
         if(FileName == null && FolderPath == null){
             System.err.println("ARRFParser: bad parameters");
@@ -52,6 +54,7 @@ public class FileHelper {
         createFile();
     }
 
+
     public boolean saveFile(byte[] fileByte, int dim){
         try {
             fbOut.write(fileByte, 0, dim);
@@ -61,6 +64,7 @@ public class FileHelper {
         }
         return true;
     }
+
 
     private void createFile(){
         try {
@@ -92,6 +96,7 @@ public class FileHelper {
         }
     }
     
+
     //L'ultimo attributo dovrà essere la classe messo in questa forma: "class", "{c1, c2, c3}"
     public boolean setAttributes(LinkedHashMap<String,String> attributes){
         if(attributes == null)
@@ -111,6 +116,7 @@ public class FileHelper {
         return true;
     }
     
+
     public boolean writeDataRow(String[] attrValues){
         if(attrValues == null)
                 return false;
@@ -127,6 +133,7 @@ public class FileHelper {
         return true;
     }
     
+
     public boolean closeFile(){
         try {
             fbOut.flush();
