@@ -15,6 +15,10 @@ import java.util.LinkedHashMap;
 
 //TODO: dato che tutte le funzioni chimano la getDbList()[0] potrei anche fare in modo che avvenga in automatico la merge nel caso in cui getDbList().length>1
 //TODO: fare in modo che se si passa un oggetto Statement alla funzione non lo rialloca ogni volta
+
+/**
+ * this class handle the database connection and query
+ */
 public class DatabaseHelper {
 
     private String basePath;

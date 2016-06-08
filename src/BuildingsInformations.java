@@ -4,6 +4,11 @@ import java.util.LinkedHashMap;
 /**
  * Created by luigi on 19/04/2016.
  */
+
+/**
+ * This class handle the know building information in local
+ * without relying on the db
+ */
 public class BuildingsInformations {
 
     private LinkedHashMap<String, ArrayList<String>> buildings;

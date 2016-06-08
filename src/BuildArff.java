@@ -7,6 +7,11 @@ import java.util.LinkedHashMap;
 /**
  * Created by Luigi on 12/04/2016.
  */
+
+/**
+ * This class handle the data to compile an arff file.
+ * Data are write in memory by a FileHelper object.
+ */
 public class BuildArff {
 
     private DatabaseHelper databaseHelper = null;
@@ -69,6 +74,11 @@ public class BuildArff {
     }
 
 
+    /**
+     * create the arff file for the specified building
+     * @param building building name
+     * @return true: no error, false: some error
+     */
     private boolean exportArffFile(String building) {
         System.out.println("EXPORT: " + building);
         //get bssid list for building
