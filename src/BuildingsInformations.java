@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
  */
 public class BuildingsInformations {
 
+    // building, bssidList
     private LinkedHashMap<String, ArrayList<String>> buildings;
 
 
@@ -58,16 +59,18 @@ public class BuildingsInformations {
      * @param bssid bssid of the query
      * @return null: bssid not present, !null: the name of the associated buidlings
      */
-    public String getBuilding(String bssid) {
+    public String[] getBuildings(String bssid) {
+        ArrayList<String> possibleBuildings = new ArrayList<>();
+
         for(String b: buildings.keySet()){
             ArrayList<String> bssidList= buildings.get(b);
             for(String bssidTemp: bssidList) {
                 if(bssidTemp.equals(bssid)) {
-                    return b;
+                    possibleBuildings.add(b);
                 }
             }
         }
-        return null;
+        return possibleBuildings.toArray(new String[possibleBuildings.size()]);
     }
 
 
@@ -94,5 +97,19 @@ public class BuildingsInformations {
             }
         }
         return false;*/
+    }
+
+
+    /**
+     * Return a LinkedHashMap with key all the possible buildings and an Integer set to 0
+     * @return LinkedHashMap
+     */
+    public LinkedHashMap<String, Integer> getCountStructure() {
+        LinkedHashMap<String, Integer> res = new LinkedHashMap<>();
+        for(String building: buildings.keySet()) {
+            res.put(building, 0);
+        }
+
+        return res;
     }
 }
