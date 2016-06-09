@@ -116,7 +116,7 @@ public class BuildArff {
         //Access room [Building]
         for(String room: roomList) {
             String[] roomPosition = room.split("_");        //building_floor_room
-            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0].replaceAll("-", " "), roomPosition[1], roomPosition[2]);    //building, floor, room name
+            ArrayList<String> experimentsId = databaseHelper.getExperiments(roomPosition[0], roomPosition[1], roomPosition[2]);    //building, floor, room name
 
             //Access sample (collection of measurements) [Building [Room]]
             for(String experimentId: experimentsId) {
