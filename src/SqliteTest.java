@@ -1,6 +1,13 @@
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+
+import static java.lang.Thread.sleep;
+
 /**
  * Created by luigi on 12/04/2016.
  */
@@ -11,6 +18,7 @@ public class SqliteTest {
     private static ArrayList<ClassifierService> clsList;
     private static BuildingsInformations bi;
     private static final int NUM_SAMPLES = 5;
+    private static String ip;
 
 
     /**
@@ -101,8 +109,38 @@ public class SqliteTest {
     }
 
 
+    /**
+     * return global ip of the current machine
+     * @return ip as a string
+     * @throws IOException in case of web service malfunction
+     */
+    private static boolean getIp(){
+        URL whatismyip = null;
+        try {
+            whatismyip = new URL("http://checkip.amazonaws.com");
+            BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+
+            ip = in.readLine(); //you get the IP as a String
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            System.out.println("Error in web service connection.");
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error in web service response parsing.");
+            return false;
+        }
+
+        return true;
+    }
+
+
     public static void main( String args[] )
     {
+        //update ip on no-ip
+        NoIP n = new NoIP("spada.elfica@gmail.com","nzor4csv4");
+        n.submitHostname("ciaoasdfghjkl.ddns.net");
+
         /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
         //merge and generate arff files
         String basePath = "C:\\resources\\";
