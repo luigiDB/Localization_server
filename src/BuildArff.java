@@ -149,7 +149,7 @@ public class BuildArff {
     public static String[] computeMeasurementArray(LinkedHashMap<String, String> measures, ArrayList<String> bssidList, String room) {
         // allocate an array lenght able to contain all bssid and one class
         String[] train =  new String[bssidList.size() + 1];
-        Arrays.fill(train, "0");
+        Arrays.fill(train, "-120");
 
         //fill the bssid cells
         for(String bssid: measures.keySet()){
