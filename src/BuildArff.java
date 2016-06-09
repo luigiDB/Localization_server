@@ -158,7 +158,9 @@ public class BuildArff {
             //insert measure in the array
             int index = getIndex(bssidList, bssid);
             if(index < 0) {
-                return null;
+                System.out.println("BSSID not found in the list: " + bssid);
+                continue;
+                //return null;
             }
             if(!rssi.equals("")) {  //maintain zero in the array in case of null value in the array
                 train[index] = rssi;
