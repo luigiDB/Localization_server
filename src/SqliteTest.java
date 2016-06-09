@@ -1,19 +1,40 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 /**
  * Created by luigi on 12/04/2016.
  */
 public class SqliteTest {
 
+    //buildingIndexes is needed to know in which clsList index is stored each building classifier
     private static LinkedHashMap<String, Integer> buildingIndexes;
     private static ArrayList<ClassifierService> clsList;
     private static BuildingsInformations bi;
-    private static int NUM_SAMPLES = 5;
+    private static final int NUM_SAMPLES = 5;
 
+
+    /**
+     * Given a sample compute the most probable building and classify
+     * @param sample LinkedHashMap<String, String> of the sampled data
+     * @return classifier result aka. room
+     */
     public static String ClassificationProcess(LinkedHashMap<String, String> sample){
-        //find the building by searching for the first bssid in sample
-        String building = bi.getBuilding(sample.keySet().iterator().next());
-        System.out.println("Selected building: " + building);
+
+        //find the most probable building for the sample
+        LinkedHashMap<String, Integer> counters = bi.getCountStructure();
+        for(String bssid: sample.keySet()) {
+            //String rssi = sample.get(bssid);
+            String possibleBuildings[] = bi.getBuildings(bssid);
+            System.out.println("possibleBuildings for " + bssid + ": " + Arrays.toString(possibleBuildings));
+            for(String building: possibleBuildings) {
+                counters.put(building, counters.get(building)+1);
+            }
+        }
+        //find the majority building
+        String building = mostProbableBuilding(counters);
+        System.out.println("SELECTED BUILDING: " + building);
+
+        // compute the input for weka classifier
         ArrayList<String> bssid = bi.getBssidList(building);
         String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
 
@@ -21,14 +42,41 @@ public class SqliteTest {
         assert trainArray != null;
         for(String str : trainArray)
             System.out.print(str + " ");
+        System.out.println();
 
 
-        //This need to the checked
+        //select of the classifier and classification
         int index = buildingIndexes.get(building);
         String result = clsList.get(index).classify(trainArray);
         return result;
     }
 
+
+    /**
+     * Given a LinkedHashMap<String, Integer> return the string with the higher Integer
+     * @param list input LinkedHashMap
+     * @return winner string
+     */
+    private static String mostProbableBuilding(LinkedHashMap<String, Integer> list) {
+        String winner = "";
+        int max = 0;
+        for(String elem: list.keySet()) {
+            int temp = list.get(elem);
+            if(temp > max) {
+                winner = elem;
+            }
+        }
+
+        return winner;
+    }
+
+
+    /**
+     * Given an array of string return the most recurrent value.
+     * This is used to obtain much higher confidence of the result.
+     * @param input Array of string
+     * @return most recurrent string
+     */
     private static String findMajority(String[] input) {
         int[] occurrences = new int[input.length];
         int indexMax = 0;
@@ -119,6 +167,7 @@ public class SqliteTest {
             System.out.println("New client is arrived!");
             for(int i = 0; i < NUM_SAMPLES; i++) {
                 LinkedHashMap<String, String> sample = socket.readClientRecord();
+                //sample <bssid, rssi>
                 System.out.println(sample.toString());
 
 
