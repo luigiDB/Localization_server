@@ -37,9 +37,11 @@ public class SqliteTest {
         // compute the input for weka classifier
         ArrayList<String> bssid = bi.getBssidList(building);
         String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
-
+        if(trainArray == null) {
+            return "Not found";
+        }
         System.out.println("Visual check of created sample:");
-        assert trainArray != null;
+
         for(String str : trainArray)
             System.out.print(str + " ");
         System.out.println();
