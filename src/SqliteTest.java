@@ -93,6 +93,7 @@ public class SqliteTest {
         int maxValue = 0;
         double confidenceLevel = 0;
         for(int i = 0; i < input.length; i++){
+            occurrences[i] = 1;
             for(int j = i + 1; j < input.length; j++){
                 if(input[i].equals(input[j]))
                     occurrences[i]++;
@@ -105,7 +106,7 @@ public class SqliteTest {
             }
         }
         confidenceLevel = ((double)maxValue / (double)input.length) * 100;
-        return input[indexMax] + "\t" +  confidenceLevel + "%";
+        return input[indexMax] + " " +  confidenceLevel + "%";
     }
 
 
@@ -200,7 +201,7 @@ public class SqliteTest {
             counter += 1;
         }
 
-        ServerHelper socket = new ServerHelper(8888);
+        ServerHelper socket = new ServerHelper(8080);
         System.out.println("Server is listening");
         String[] results = new String[NUM_SAMPLES];
         while(socket.acceptNewClient()){
