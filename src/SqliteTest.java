@@ -1,10 +1,10 @@
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.sleep;
 
@@ -19,6 +19,8 @@ public class SqliteTest {
     private static BuildingsInformations bi;
     private static final int NUM_SAMPLES = 5;
     private static String ip;
+    String basePath;
+    private static Lock lock;
 
 
     /**
@@ -56,8 +58,14 @@ public class SqliteTest {
 
 
         //select of the classifier and classification
-        int index = buildingIndexes.get(building);
-        String result = clsList.get(index).classify(trainArray);
+        lock.lock();
+        String result;
+        try {
+            int index = buildingIndexes.get(building);
+            result = clsList.get(index).classify(trainArray);
+        } finally {
+            lock.unlock();
+        }
         return result;
     }
 
@@ -136,76 +144,94 @@ public class SqliteTest {
     }
 
 
+    private static void createClassifier(String basePath, String baseName, BuildArff ba) {
+        ClassifierService temp;
+        int counter = 0;
+
+        //
+        if(!ba.deleteArffFiles()) {
+            System.out.println("Impossible to delete some arff file");
+            return;
+        }
+        ba.exportArffFiles();
+
+        lock.lock();
+        try {
+            //blank previous structures
+            clsList.clear();
+            buildingIndexes.clear();
+
+            //
+            for (String building : bi.getBuildingList()) {
+                System.out.println("create classifier for: " + building);
+                temp = new ClassifierService();
+                temp.buildClassifier(basePath + baseName + "_" + building.replaceAll(" ", "-") + ".arff");
+
+                //add classifier
+                clsList.add(temp);
+
+                //add building index
+                buildingIndexes.put(building, counter);
+                counter += 1;
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
     public static void main( String args[] )
     {
-        //update ip on no-ip
-        NoIP n = new NoIP("spada.elfica@gmail.com","nzor4csv4");
-        n.submitHostname("ciaoasdfghjkl.ddns.net");
+        //create lock
+        lock = new ReentrantLock();
 
-        /*------------------------------TEST CLASSE DatabaseHelper and BuildingsInfo.*/
-        //merge and generate arff files
         String basePath = "C:\\resources\\";
         String baseName = "base";
 
         DatabaseHelper dh = new DatabaseHelper(basePath);
 
+        lock.lock();
+        try {
+            clsList = new ArrayList<>();
+            buildingIndexes = new LinkedHashMap<>();
+        } finally {
+            lock.unlock();
+        }
+
+        //update ip on no-ip
+        NoIP n = new NoIP("spada.elfica@gmail.com","nzor4csv4");
+        n.submitHostname("ciaoasdfghjkl.ddns.net");
+
         //export arff files
         bi = new BuildingsInformations();
         BuildArff ba = new BuildArff(dh, baseName, bi, basePath);
+
+
+        /*if(!ba.deleteArffFiles()) {
+            System.out.println("Impossible to delete some arff file");
+            return;
+        }
         ba.exportArffFiles();
-
-        /*
-        //testing the classifier
-        LinkedHashMap<String, String> sample;       //need to initialized
-        //find the building by searching for the first bssid in sample
-        String building = bi.getBuilding(sample.entrySet().iterator().next());
-        ArrayList<String> bssid = bi.getBssidList(building);
-        String[] trainArray = BuildArff.computeMeasurementArray(sample, bssid, null);
-
-        System.out.println("Visual check of created sample: \n" + trainArray.toString());
         */
+        //build classifier
+        createClassifier(basePath, baseName, ba);
 
-
-        /*-----------------------------------TEST CLASSE ClassifierService
-        ClassifierService cls = new ClassifierService();
-        cls.buildClassifier(basePath + "baruffa_polo_c.arff");
-        String test = "0,0,-80,0,0,-92,-60,0,0,0,-79,0,0,0,0,0,0,-87,0,-81,0,0,0,0,0,0,0,0,-84,-69,0,0,0,-87,0,-84,-84,-84,0,0,-84,-78,0,-78,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
-        test += ",0";     //aggiungo artificialmente uno zero dove dovrebbe esserci invece la classe "polo_c_2_2", ma che non c'è perchè è da classificare
-        String[] parsed = test.split(",");
-        System.out.println(cls.classify(parsed));
-        */
-
-
-        /*-----------------------------------TEST CLASSE ServerHelper con lato client*/
-
-        //TODO: this must be changed and need to pickup the correct arff file based on building
-        /*
-        ClassifierService cls = new ClassifierService();
-        cls.buildClassifier(basePath + "baruffa_casa-giulio.arff");
-        */
-        //list method
-        clsList = new ArrayList<>();
-        buildingIndexes = new LinkedHashMap<>();
-        ClassifierService temp;
-        int counter = 0;
-        for(String building: bi.getBuildingList()) {
-            System.out.println("create classifier for: " + building);
-            temp = new ClassifierService();
-            temp.buildClassifier(basePath + baseName + "_" + building.replaceAll(" ", "-") + ".arff");
-
-            //add classifier
-            clsList.add(temp);
-
-            //add building index
-            buildingIndexes.put(building, counter);
-            counter += 1;
+        //file server
+        System.out.println("Start file server");
+        try {
+            DbServerThread test = new DbServerThread(8000, basePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("File server - Impossible to start file server");
         }
 
+        //contribution server
+        System.out.println("Start contribution server");
         ServerHelper socket = new ServerHelper(8080);
-        System.out.println("Server is listening");
+        System.out.println("Contribution Server is listening");
         String[] results = new String[NUM_SAMPLES];
         while(socket.acceptNewClient()){
-            System.out.println("New client is arrived!");
+            System.out.println("Contribution Server - New client is arrived!");
             for(int i = 0; i < NUM_SAMPLES; i++) {
                 LinkedHashMap<String, String> sample = socket.readClientRecord();
                 //sample <bssid, rssi>
@@ -217,8 +243,25 @@ public class SqliteTest {
             }
             String result = findMajority(results);
             socket.writeSingleLine(result);
-            System.out.println("Server response: " + result);
+            System.out.println("Contribution Server - Server response: " + result);
             socket.closeClient();
+
+
+            //if db files are more than one retrain
+            if(dh.getDbList().length > 1) {
+                /*if(!ba.deleteArffFiles()) {
+                    System.out.println("Impossible to delete some arff file");
+                    return;
+                }
+                ba.exportArffFiles();
+
+                //blank previous structures
+                clsList.clear();
+                buildingIndexes.clear();*/
+
+                //recreate classifier
+                createClassifier(basePath, baseName, ba);
+            }
         }
 
     }
