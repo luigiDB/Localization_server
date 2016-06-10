@@ -247,7 +247,7 @@ public class DatabaseHelper {
                     "WHERE " + KEY_EDIFICIO + " = \"" + building + "\" " +
                     "AND " + KEY_PIANO + " = \"" + floor + "\" " +
                     "AND " + KEY_AULA + " = \"" + room + "\"";
-            System.out.println("QUERY: " + query);
+            //System.out.println("QUERY: " + query);
             ResultSet resultSet = statement.executeQuery(query);
             while(resultSet.next()) {
                 res.add(resultSet.getString("ret"));
