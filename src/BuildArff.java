@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FilenameFilter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -243,5 +246,26 @@ public class BuildArff {
         for (int i = 0; i < list.size(); i++) {
             list.set(i, list.get(i).replaceAll(originChar, newChar));
         }
+    }
+
+
+    /**
+     * Remove all the arff files in the resource folder
+     * @return true: all files removed, false: some error in deleting
+     */
+    public boolean deleteArffFiles() {
+        File dir = new File(destinationPath);
+        File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".arff");
+            }
+        });
+
+        for(File file: files) {
+            if(!file.delete()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
