@@ -162,5 +162,8 @@ public class ClassifyThread implements Runnable{
 
         }
         socket.closeAll();
+        if (!BuildArff.deleteArffFiles(basePath)) {
+            System.out.println("Error in deleting the arff files");
+        }
     }
 }

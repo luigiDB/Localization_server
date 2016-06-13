@@ -66,15 +66,24 @@ public class SqliteTest {
             ServerHelper server = new ServerHelper(portClassifiction);
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.submit(new ClassifyThread(NUM_SAMPLES, basePath, server));
+            Future f = executor.submit(new ClassifyThread(NUM_SAMPLES, basePath, server));
 
             try {
                 sleep(1000 * 20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
-            server.closeAll();
+
+                server.closeAll();
+                f.cancel(true);
+                sleep(1000 * 10);
+                /*
+                if (!BuildArff.deleteArffFiles(basePath)) {
+                    System.out.println("Error in deleting the arff files");
+                    break;
+                }
+                */
+            }catch (InterruptedException e) {
+                    e.printStackTrace();
+            }
         }
     }
 

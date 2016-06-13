@@ -253,8 +253,9 @@ public class BuildArff {
      * Remove all the arff files in the resource folder
      * @return true: all files removed, false: some error in deleting
      */
-    public boolean deleteArffFiles() {
-        File dir = new File(destinationPath);
+    public static boolean deleteArffFiles(String Path) {
+        File dir = new File(Path);
+        boolean ret = true;
         File[] files = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".arff");
@@ -263,9 +264,9 @@ public class BuildArff {
 
         for(File file: files) {
             if(!file.delete()) {
-                return false;
+                ret = false;
             }
         }
-        return true;
+        return ret;
     }
 }
