@@ -30,7 +30,7 @@ public class ServerHelper {
             out = new PrintWriter(client.getOutputStream(), true);
             inLine = new BufferedReader(new InputStreamReader(client.getInputStream()));
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
         if(client != null && out != null && inLine != null)
@@ -86,13 +86,29 @@ public class ServerHelper {
         try {
             if(inLine != null) {
                 inLine.close();
+                inLine = null;
             }
             if(out != null) {
                 out.flush();
                 out.close();
+                out = null;
             }
-            if(client != null)
+            if(client != null) {
                 client.close();
+                client = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeAll(){
+        this.closeClient();
+        try {
+            if(server != null) {
+                server.close();
+                server = null;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

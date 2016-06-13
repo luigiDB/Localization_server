@@ -39,7 +39,6 @@ public class ClassifierService {
                 String classValue = data.classAttribute().value(i);
                 classes[i] = classValue;
             }
-
         }catch(Exception e){
             e.printStackTrace();
             return false;
@@ -63,5 +62,6 @@ public class ClassifierService {
             return null;
         }
     }
+
 
 }
