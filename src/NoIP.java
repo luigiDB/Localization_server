@@ -27,15 +27,26 @@ public class NoIP extends Thread {
         this.password = password;
         this.start();
     }
-    
+
+
+    public NoIP(String username, String password, int updateTime) {
+        this.username = username;
+        this.password = password;
+        this.updateTime = updateTime;
+        this.start();
+    }
+
+
     private List<String> hostnames = new LinkedList<String>();
-    
+
+
     public void submitHostname(String hostname){
         synchronized(hostnames) {
             hostnames.add(hostname);
         }
     }
-    
+
+
     public void run(){
         while(true){
             try {
@@ -57,7 +68,8 @@ public class NoIP extends Thread {
             }
         }
     }
-    
+
+
     private String getCurrentIP(){
         String IP = "null";
         String host = "http://bot.whatismyipaddress.com";
@@ -74,7 +86,8 @@ public class NoIP extends Thread {
         System.out.println("IP: " + IP);
         return IP;
     }
-    
+
+
     private boolean submitIpUpdate(String newIP,String hostname){
         System.out.println("submitIpUpdate");
         String host = "http://dynupdate.no-ip.com/nic/update?hostname="+hostname+"&myip="+newIP;

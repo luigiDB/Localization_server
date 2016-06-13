@@ -29,11 +29,11 @@ public class DbServerThread extends Thread{
         byte[] message = new byte[DIM_BUF];
         int length = 0;
         int received = 0;
-        System.out.println("Server is listening");
+        System.out.println("File server - Server is listening");
         try {
             while(true) {
                 actual = socket.accept();
-                System.out.println("New contribution is arrived!");
+                System.out.println("File server - New contribution is arrived!");
                 //TODO: find a better naming system
                 fh = new FileHelper("file.db", basePath);
                 DataInputStream dIn = new DataInputStream(actual.getInputStream());
