@@ -142,7 +142,6 @@ public class DatabaseHelper {
      * @return null: some error in db connection, !null: an ArrayList<String> containing bssid
      */
     public ArrayList<String> getBssid(String building) {
-        System.out.println("getBssid");
         File fileDb = getDbList()[0];
         ArrayList<String> res = new ArrayList<>();
         try {
@@ -203,7 +202,6 @@ public class DatabaseHelper {
      * @return null: some error in db connection, !null: an ArrayList<String> containing rooms => building_floor_room
      */
     public ArrayList<String> getRoomList(String building) {
-        System.out.println("getRoomList");
         File fileDb = getDbList()[0];
         ArrayList<String> res = new ArrayList<>();
         try {
@@ -236,7 +234,6 @@ public class DatabaseHelper {
      * @return null: some error in db connection, !null: an ArrayList<String> containing experiments
      */
     public ArrayList<String> getExperiments(String building, String floor, String room) {
-        System.out.println("getExperiments()");
         File fileDb = getDbList()[0];
         ArrayList<String> res = new ArrayList<>();
         try {

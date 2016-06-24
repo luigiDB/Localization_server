@@ -212,7 +212,7 @@ public class BuildArff {
             }
         }
         nominalValue += "}";
-        System.out.println("\n\nNOMINAL VALUE: " + nominalValue);
+        System.out.println("NOMINAL VALUE: " + nominalValue + "\n");
         return nominalValue;
     }
 

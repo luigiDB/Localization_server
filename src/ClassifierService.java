@@ -21,6 +21,11 @@ public class ClassifierService {
         data = null;
     }
 
+    /**
+     * It builds the classifier and trains it using the training set provided by the ARFF file
+     * @param filePath It is a string that represents the file path pointing to the ARFF file
+     * @return
+     */
     public boolean buildClassifier(String filePath){
         if(filePath == null || filePath.isEmpty())
             return false;
@@ -46,6 +51,11 @@ public class ClassifierService {
         return true;
     }
 
+    /**
+     * Given an array of strings, it performs the classification and provides the result.
+     * @param sample It is an array of string, each of which represents the RSSI related to a particular MAC address
+     * @return String, the result given by the classifier
+     */
     public String classify(String[] sample){
         if(sample == null || sample.length != data.numAttributes())
             return null;

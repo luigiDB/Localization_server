@@ -41,6 +41,9 @@ public class ClassifyThread implements Runnable{
         }
         //find the majority building
         String building = mostProbableBuilding(counters);
+        if(building.equals("")) {
+            return "Not found";
+        }
         System.out.println("SELECTED BUILDING: " + building);
 
         // compute the input for weka classifier
@@ -129,6 +132,7 @@ public class ClassifyThread implements Runnable{
         buildingIndexes = new LinkedHashMap<>();
         ClassifierService temp;
         int counter = 0;
+        //Create a classifier for each current building
         for (String building : bi.getBuildingList()) {
             System.out.println("create classifier for: " + building);
             temp = new ClassifierService();
@@ -143,24 +147,30 @@ public class ClassifyThread implements Runnable{
         }
 
         System.out.println("Server is listening");
+        //Prepare an array to collect the samples that will arrive
         String[] results = new String[NUM_SAMPLES];
-        while (socket.acceptNewClient()) {
+        //Infinite loop
+        while (socket.acceptNewClient()) {                 //When the main thread closes the socket it exits from the loop
             System.out.println("New client is arrived!");
+            //For each sample
             for (int i = 0; i < NUM_SAMPLES; i++) {
+                //Retrieve the sample from the client
                 LinkedHashMap<String, String> sample = socket.readClientRecord();
                 //sample <bssid, rssi>
                 System.out.println(sample.toString());
-
-
+                //Apply the classification using that sample
                 results[i] = ClassificationProcess(sample);
                 System.out.println(results[i]);
             }
+            //After having collected every results, find the majority
             String result = findMajority(results);
+            //Send the response to the client
             socket.writeSingleLine(result);
             System.out.println("Server response: " + result);
             socket.closeClient();
 
         }
+        //If we are here it means that the main thread wants to terminate this thread
         socket.closeAll();
         if (!BuildArff.deleteArffFiles(basePath)) {
             System.out.println("Error in deleting the arff files");

@@ -23,7 +23,10 @@ public class DbServerThread extends Thread{
         start();
     }
 
-
+    /**
+     * This is a basic thread that receives contribution databases from clients
+     * and saves them inside a given folder
+     */
     public void run(){
         Socket actual;
         byte[] message = new byte[DIM_BUF];
@@ -34,8 +37,8 @@ public class DbServerThread extends Thread{
             while(true) {
                 actual = socket.accept();
                 System.out.println("File server - New contribution is arrived!");
-                //TODO: find a better naming system
-                fh = new FileHelper("file.db", basePath);
+
+                fh = new FileHelper("New_Contribution.db", basePath);
                 DataInputStream dIn = new DataInputStream(actual.getInputStream());
                 //Read the file size
                 length = dIn.readInt();

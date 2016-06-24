@@ -23,31 +23,6 @@ public class SqliteTest {
     private static int portClassifiction = 8080;
 
 
-    /**
-     * return global ip of the current machine
-     * @return ip as a string
-     * @throws IOException in case of web service malfunction
-     */
-    private static boolean getIp(){
-        URL whatismyip = null;
-        try {
-            whatismyip = new URL("http://checkip.amazonaws.com");
-            BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-
-            ip = in.readLine(); //you get the IP as a String
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            System.out.println("Error in web service connection.");
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error in web service response parsing.");
-            return false;
-        }
-
-        return true;
-    }
-
 
     public static void main( String args[] )
     {
@@ -58,29 +33,27 @@ public class SqliteTest {
             e.printStackTrace();
         }
 
-        //update ip on no-ip
-        NoIP n = new NoIP("spada.elfica@gmail.com","nzor4csv4");
-        n.submitHostname("ciaoasdfghjkl.ddns.net");
+        //Create the class (and the thread) to upload periodically the public IP address
+        NoIP dnsService = new NoIP("spada.elfica@gmail.com","nzor4csv4");
+        //The public IP address will be bound to a given URL address
+        dnsService.submitHostname("ciaoasdfghjkl.ddns.net");
 
         while(true) {
+            //Create a server socket for the classification thread
             ServerHelper server = new ServerHelper(portClassifiction);
-
+            //Use an ExecutorService with one single thread to run the Classification Thread
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future f = executor.submit(new ClassifyThread(NUM_SAMPLES, basePath, server));
 
             try {
-                sleep(1000 * 20);
-
-
+                //After 10 minutes it closes the server socket. This is the signal to stop for the ClassifyThread
+                sleep(1000 * 60 * 5);
+                //Once the server has been closed, the thread will come out from the infinite loop
                 server.closeAll();
-                f.cancel(true);
-                sleep(1000 * 10);
-                /*
-                if (!BuildArff.deleteArffFiles(basePath)) {
-                    System.out.println("Error in deleting the arff files");
-                    break;
-                }
-                */
+                //Be sure that the thread will be terminated
+                f.cancel(false);
+                //It waits 1 minute before re-starting the ClassifyThread
+                sleep(1000 * 60);
             }catch (InterruptedException e) {
                     e.printStackTrace();
             }

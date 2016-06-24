@@ -70,6 +70,7 @@ public class FileHelper {
         try {
             file = new File(FolderPath, FileName);
             // creates the file
+
             if(file.exists()){
                 Integer appendix = 1;
                 while(true){
@@ -83,6 +84,7 @@ public class FileHelper {
                     appendix++;
                 }                
             }
+
             boolean res = file.createNewFile();
             if(!res){
                 file = null;
@@ -90,7 +92,7 @@ public class FileHelper {
             }
  
             fbOut = new FileOutputStream(file);
-            fb = new FileWriter(file);
+            fb = new FileWriter(file, false);
         } catch (IOException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
