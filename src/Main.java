@@ -15,7 +15,7 @@ import static java.lang.Thread.sleep;
 /**
  * Created by luigi on 12/04/2016.
  */
-public class SqliteTest {
+public class Main {
     private static final int NUM_SAMPLES = 3;
     private static String ip;
     private static String basePath = "C:\\resources\\";
@@ -47,7 +47,7 @@ public class SqliteTest {
 
             try {
                 //After 10 minutes it closes the server socket. This is the signal to stop for the ClassifyThread
-                sleep(1000 * 60 * 5);
+                sleep(1000 * 60 * 10);
                 //Once the server has been closed, the thread will come out from the infinite loop
                 server.closeAll();
                 //Be sure that the thread will be terminated
